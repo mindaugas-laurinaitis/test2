@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Traits\JsonSerializeTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use JsonSerializable;
+use DateTime;
 
 class Subscriber implements IdentifiableInterface, JsonSerializable
 {
@@ -28,13 +29,19 @@ class Subscriber implements IdentifiableInterface, JsonSerializable
     private $email;
 
     /**
-     * @var string
+     * @var array
      */
-    private $category;
+    private $categories = [];
+
+    /**
+     * @var DateTime 
+     */
+    private $createdAt;
 
     public function __construct()
     {
         $this->id = uuid_create(UUID_TYPE_RANDOM);
+        $this->createdAt = new DateTime();
     }
 
     /**
@@ -98,22 +105,31 @@ class Subscriber implements IdentifiableInterface, JsonSerializable
 
     /**
      *
-     * @return string|null
+     * @return array
      */
-    public function getCategory(): ?string
+    public function getCategories(): array
     {
-        return $this->category;
+        return $this->categories;
     }
 
     /**
-     * @param string|null $category
+     * @param array $categories
      *
      * @return Subscriber
      */
-    public function setCategory(?string $category): Subscriber
+    public function setCategories(array $categories): Subscriber
     {
-        $this->category = $category;
+        $this->categories = $categories;
 
         return $this;
+    }
+
+    /**
+     *
+     * @return DateTime|null
+     */
+    public function getCreatedAt(): ?DateTime
+    {
+        return $this->createdAt;
     }
 }
