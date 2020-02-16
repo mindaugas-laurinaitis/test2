@@ -21,8 +21,8 @@
                 <td>{{ subscriber.name }}</td>
                 <td>{{ subscriber.email }}</td>
                 <td>
-                    <a href="{{ path('subscriber_show', {'id': subscriber.id}) }}">show</a>
-                    <a href="{{ path('subscriber_edit', {'id': subscriber.id}) }}">edit</a>
+                    <a href="{{ path('admin_subscriber_show', {'id': subscriber.id}) }}">show</a>
+                    <a href="{{ path('admin_subscriber_edit', {'id': subscriber.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -33,5 +33,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('subscriber_new') }}">Create new</a>
+    <a href="{{ path('admin_subscriber_new') }}">Create new</a>
 {% endblock %}
