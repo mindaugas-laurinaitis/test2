@@ -92,12 +92,10 @@ class SubscriberController extends AbstractController
     /**
      * @Route("/{id}", name="subscriber_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Subscriber $subscriber): Response
+    public function delete(Request $request, string $id): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$subscriber->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($subscriber);
-            $entityManager->flush();
+        if ($this->isCsrfTokenValid('delete'.$id, $request->request->get('_token'))) {
+            $this->subscriberRepository->delete($id);
         }
 
         return $this->redirectToRoute('admin_subscriber_index');
