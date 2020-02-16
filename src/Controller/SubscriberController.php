@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/subscriber")
+ * @Route("/admin/subscriber", name="admin_")
  */
 class SubscriberController extends AbstractController
 {
@@ -46,11 +46,9 @@ class SubscriberController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($subscriber);
-            $entityManager->flush();
+            $this->subscriberRepository->insert($subscriber);
 
-            return $this->redirectToRoute('subscriber_index');
+            return $this->redirectToRoute('admin_subscriber_index');
         }
 
         return $this->render('subscriber/new.html.twig', [
@@ -82,7 +80,7 @@ class SubscriberController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->subscriberRepository->update($subscriber);
 
-            return $this->redirectToRoute('subscriber_index');
+            return $this->redirectToRoute('admin_subscriber_index');
         }
 
         return $this->render('subscriber/edit.html.twig', [
@@ -102,6 +100,6 @@ class SubscriberController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('subscriber_index');
+        return $this->redirectToRoute('admin_subscriber_index');
     }
 }

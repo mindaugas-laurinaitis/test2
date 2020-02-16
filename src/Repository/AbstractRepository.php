@@ -4,14 +4,16 @@ namespace App\Repository;
 
 use App\Entity\IdentifiableInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 abstract class AbstractRepository
 {
-    protected const BASE_STORE_PATH = '%kernel.root_dir%/../../var/db';
+    protected const BASE_STORE_PATH = __DIR__ . '/../../var/db';
 
     /**
      * @var Filesystem
@@ -22,6 +24,11 @@ abstract class AbstractRepository
      * @var Finder
      */
     protected Finder $finder;
+
+    /**
+     * @var AsciiSlugger
+     */
+    protected AsciiSlugger $slugger;
 
     abstract protected function getTargetEntity():string;
 
@@ -37,35 +44,42 @@ abstract class AbstractRepository
         $normalizers = [new ObjectNormalizer()];
 
         $this->serializer = new Serializer($normalizers, $encoders);
+
+
+        $this->slugger = new AsciiSlugger();
     }
 
-    public function insert(IdentifiableInterface $object)
+    public function insert(IdentifiableInterface $object): void
     {
+        dump($this->getPath($object->getId()));
         $this->fileSystem->dumpFile($this->getPath($object->getId()), json_encode($object));
     }
 
-    public function update(IdentifiableInterface $object)
+    public function update(IdentifiableInterface $object): void
     {
         $this->insert($object);
     }
 
-    public function findAll()
+    public function findAll(): array
     {
-        $this->finder->files()->in($this->getEntityPath());
-
         $objects = [];
 
-        if ($this->finder->hasResults()) {
-            foreach ($this->finder as $file) {
-                $fileNameWithExtension = $file->getRelativePathname();
-                $objects[] = $this->serializer->deserialize(file_get_contents($this->getEntityPath() . '/' . $fileNameWithExtension), $this->getTargetEntity(), JsonEncoder::FORMAT);
+        try {
+            $this->finder->files()->in($this->getEntityPath());
+            if ($this->finder->hasResults()) {
+                foreach ($this->finder as $file) {
+                    $fileNameWithExtension = $file->getRelativePathname();
+                    $objects[] = $this->serializer->deserialize(file_get_contents($this->getEntityPath() . '/' . $fileNameWithExtension), $this->getTargetEntity(), JsonEncoder::FORMAT);
+                }
             }
+        } catch (DirectoryNotFoundException $directoryNotFoundException){
+
         }
 
         return $objects;
     }
 
-    public function find(string $id)
+    public function find(string $id): ?object
     {
         $object = null;
 
@@ -76,13 +90,13 @@ abstract class AbstractRepository
         return $object;
     }
 
-    protected function getPath(string $id, $extension = '.json')
+    protected function getPath(string $id, $extension = '.json'): string
     {
         return $this->getEntityPath() . '/'. $id . $extension;
     }
 
-    protected function getEntityPath()
+    protected function getEntityPath(): string
     {
-        return self::BASE_STORE_PATH . '/' . $this->getTargetEntity();
+        return self::BASE_STORE_PATH . '/' . $this->slugger->slug($this->getTargetEntity());
     }
 }

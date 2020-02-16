@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
-
+use App\Traits\JsonSerializeTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use JsonSerializable;
 
 class Subscriber implements IdentifiableInterface, JsonSerializable
 {
+    use JsonSerializeTrait;
+
     /**
      * @var string
      */
@@ -113,19 +115,5 @@ class Subscriber implements IdentifiableInterface, JsonSerializable
         $this->category = $category;
 
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        $data = [];
-
-        foreach ($this as $key => $value) {
-            $data[$key] = $value;
-        }
-
-        return $data;
     }
 }
