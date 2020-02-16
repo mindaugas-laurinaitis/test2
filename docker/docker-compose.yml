@@ -59,3 +59,13 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  encore:
+    image: node:12
+    volumes:
+      - ./..:/var/www/html
+    ports:
+      - "8080:8080"
+    working_dir: /var/www/html
+    command: >
+      bash -c "yarn install &&
+               yarn encore dev-server --public ${PROJECT_BASE_URL}:8080 --host 0.0.0.0 --disable-host-check"

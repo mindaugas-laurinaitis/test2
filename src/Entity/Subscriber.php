@@ -25,6 +25,7 @@ class Subscriber implements IdentifiableInterface, JsonSerializable
     /**
      * @var string
      * @Assert\NotBlank
+     * @Assert\Email()
      */
     private $email;
 
