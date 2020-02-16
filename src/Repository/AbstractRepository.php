@@ -89,7 +89,7 @@ abstract class AbstractRepository
 
         return $object;
     }
-    
+
     public function delete(string $id): void
     {
         $this->fileSystem->remove($this->getPath($id));
