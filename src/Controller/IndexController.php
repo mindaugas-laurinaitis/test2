@@ -15,17 +15,7 @@ class IndexController extends AbstractController
     /**
      * @Route("/", name="index")
      */
-    public function index()
-    {
-        return $this->render('index/index.html.twig', [
-            'controller_name' => 'IndexController',
-        ]);
-    }
-
-    /**
-     * @Route("/subscribe", name="subscribe", methods={"GET","POST"})
-     */
-    public function new(Request $request, SubscriberRepository $subscriberRepository): Response
+    public function index(Request $request, SubscriberRepository $subscriberRepository): Response
     {
         $subscriber = new Subscriber();
         $form = $this->createForm(SubscriberType::class, $subscriber);
@@ -34,7 +24,7 @@ class IndexController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $subscriberRepository->insert($subscriber);
 
-//            return $this->redirectToRoute('index');
+            return $this->redirectToRoute('index');
         }
 
         return $this->render('subscriber/new.html.twig', [
