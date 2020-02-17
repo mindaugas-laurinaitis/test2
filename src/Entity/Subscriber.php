@@ -35,7 +35,7 @@ class Subscriber implements IdentifiableInterface, JsonSerializable
     private $categories = [];
 
     /**
-     * @var DateTime 
+     * @var DateTime
      */
     private $createdAt;
 
@@ -121,6 +121,21 @@ class Subscriber implements IdentifiableInterface, JsonSerializable
     public function setCategories(array $categories): Subscriber
     {
         $this->categories = $categories;
+
+        return $this;
+    }
+
+    /**
+     * @param DateTime $createdAt
+     *
+     * @return Subscriber
+     */
+    public function setCreatedAt($createdAt): Subscriber
+    {
+        if (!$createdAt instanceof DateTime) {
+            $createdAt = new DateTime($createdAt);
+        }
+        $this->createdAt = $createdAt;
 
         return $this;
     }

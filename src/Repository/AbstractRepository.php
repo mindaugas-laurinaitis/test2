@@ -3,10 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\IdentifiableInterface;
+use PhpParser\Node\Param;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -30,7 +32,7 @@ abstract class AbstractRepository
      */
     protected AsciiSlugger $slugger;
 
-    abstract protected function getTargetEntity():string;
+    abstract protected function getTargetEntity(): string;
 
     public function __construct()
     {
@@ -44,7 +46,6 @@ abstract class AbstractRepository
         $normalizers = [new ObjectNormalizer()];
 
         $this->serializer = new Serializer($normalizers, $encoders);
-
 
         $this->slugger = new AsciiSlugger();
     }
@@ -60,8 +61,10 @@ abstract class AbstractRepository
         $this->insert($object);
     }
 
-    public function findAll(): array
+    public function findAll($order = []): array
     {
+        dump($order);
+
         $objects = [];
 
         try {
@@ -72,7 +75,24 @@ abstract class AbstractRepository
                     $objects[] = $this->serializer->deserialize(file_get_contents($this->getEntityPath() . '/' . $fileNameWithExtension), $this->getTargetEntity(), JsonEncoder::FORMAT);
                 }
             }
-        } catch (DirectoryNotFoundException $directoryNotFoundException){
+            if (!empty($order)) {
+                usort(
+                    $objects, function ($a, $b) use ($order) {
+                    $property = array_key_first($order);
+                    $orderBy = $order[$property];
+                    $getter = sprintf('get%s', ucfirst($property));
+
+                    if (method_exists($a, $getter)) {
+                        if ($orderBy === 'asc') {
+                            return $a->{$getter}() > $b->{$getter}();
+                        } else {
+                            return $a->{$getter}() < $b->{$getter}();
+                        }
+                    }
+                }
+                );
+            }
+        } catch (DirectoryNotFoundException $directoryNotFoundException) {
 
         }
 
@@ -83,8 +103,8 @@ abstract class AbstractRepository
     {
         $object = null;
 
-        if(false !== $data = file_get_contents($this->getPath($id))){
-            $object = $this->serializer->deserialize($data, $this->getTargetEntity(),JsonEncoder::FORMAT);
+        if (false !== $data = file_get_contents($this->getPath($id))) {
+            $object = $this->serializer->deserialize($data, $this->getTargetEntity(), JsonEncoder::FORMAT);
         }
 
         return $object;
@@ -97,7 +117,7 @@ abstract class AbstractRepository
 
     protected function getPath(string $id, $extension = '.json'): string
     {
-        return $this->getEntityPath() . '/'. $id . $extension;
+        return $this->getEntityPath() . '/' . $id . $extension;
     }
 
     protected function getEntityPath(): string

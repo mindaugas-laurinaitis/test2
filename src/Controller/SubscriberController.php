@@ -6,6 +6,7 @@ use App\Entity\Subscriber;
 use App\Form\SubscriberType;
 use App\Repository\SubscriberRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -29,13 +30,25 @@ class SubscriberController extends AbstractController
     /**
      * @Route("/", name="subscriber_index", methods={"GET"})
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $order = $request->query->get('order');
+
         return $this->render('subscriber/index.html.twig', [
-            'subscribers' => $this->subscriberRepository->findAll(),
+            'subscribers' => $this->subscriberRepository->findAll($order),
         ]);
     }
+    /**
+     * @Route("/list", name="subscriber_list", methods={"GET","POST"})
+     */
+    public function list(Request $request): Response
+    {
+        $order = $request->query->get('order');
 
+        return $this->render('subscriber/_table_body.html.twig', [
+            'subscribers' => $this->subscriberRepository->findAll($order),
+        ]);
+    }
     /**
      * @Route("/new", name="subscriber_new", methods={"GET","POST"})
      */
