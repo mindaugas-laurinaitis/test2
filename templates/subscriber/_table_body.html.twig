@@ -1,0 +1,17 @@
+{% for subscriber in subscribers %}
+    <tr>
+        <td>{{ subscriber.id }}</td>
+        <td>{{ subscriber.name }}</td>
+        <td>{{ subscriber.email }}</td>
+        <td>{{ subscriber.categories|join(', ') }}</td>
+        <td>{{ subscriber.createdAt|date("Y-m-d h:m:s") }}</td>
+        <td>
+            <a href="{{ path('admin_subscriber_show', {'id': subscriber.id}) }}">show</a>
+            <a href="{{ path('admin_subscriber_edit', {'id': subscriber.id}) }}">edit</a>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="4">no records found</td>
+    </tr>
+{% endfor %}

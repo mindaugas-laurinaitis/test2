@@ -5,35 +5,19 @@
 {% block body %}
     <h1>Subscriber index</h1>
 
-    <table class="table">
+    <table class="table sortable-table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Name</th>
-                <th>Email</th>
+                <th class="sortable" data-field-name = "name">Name</th>
+                <th class="sortable" data-field-name = "email">Email</th>
                 <th>categories</th>
-                <th>createdAt</th>
+                <th class="sortable" data-field-name = "createdAt">createdAt</th>
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for subscriber in subscribers %}
-            <tr>
-                <td>{{ subscriber.id }}</td>
-                <td>{{ subscriber.name }}</td>
-                <td>{{ subscriber.email }}</td>
-                <td>{{ subscriber.categories|join(', ') }}</td>
-                <td>{{ subscriber.createdAt|date("Y-m-d h:m:s") }}</td>
-                <td>
-                    <a href="{{ path('admin_subscriber_show', {'id': subscriber.id}) }}">show</a>
-                    <a href="{{ path('admin_subscriber_edit', {'id': subscriber.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
+        {{ include('subscriber/_table_body.html.twig', {subscribers:subscribers}) }}
         </tbody>
     </table>
 

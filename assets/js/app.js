@@ -1,14 +1,41 @@
 // app.js
-require('../css/global.scss');
+require('../css/app.scss');
 const $ = require('jquery');
 // this "modifies" the jquery module: adding behavior to it
 // the bootstrap module doesn't export/return anything
 require('bootstrap');
 
-// or you can include specific pieces
-// require('bootstrap/js/dist/tooltip');
-// require('bootstrap/js/dist/popover');
+const app = {
+    init: function () {
+        $(() => {
+            this.sortableTable();
+        });
+    },
+    sortableTable: function () {
+        $('.sortable-table .sortable').each(function () {
+            let $this = $(this);
+            $this.on('click', function () {
+                let order = 'asc';
+                if($this.hasClass('asc')) {
+                    order = 'desc';
+                }
+                if($this.hasClass('desc')) {
+                    order = null;
+                }
+                $this.removeClass('asc').removeClass('desc').addClass(order);
 
-$(document).ready(function() {
-    $('[data-toggle="popover"]').popover();
-});
+                $.get(
+                    '/admin/subscriber/list',
+                    order !== null ? 'order[' + $this.data('field-name') + ']=' + order : '',
+                    data => {
+                        console.log($this);
+                        console.log($this.closest('tbody'));
+                        $this.parents('table').find('tbody').html(data);
+                    }
+                );
+            });
+        });
+    }
+};
+
+app.init();
