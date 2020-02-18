@@ -52,7 +52,6 @@ abstract class AbstractRepository
 
     public function insert(IdentifiableInterface $object): void
     {
-        dump($this->getPath($object->getId()));
         $this->fileSystem->dumpFile($this->getPath($object->getId()), json_encode($object));
     }
 
@@ -63,8 +62,6 @@ abstract class AbstractRepository
 
     public function findAll($order = []): array
     {
-        dump($order);
-
         $objects = [];
 
         try {
