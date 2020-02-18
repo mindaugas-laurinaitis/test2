@@ -1,0 +1,45 @@
+---
+version: 2
+jobs:
+  tests:
+    docker:
+      - image: wodby/php:7.4-dev-4.14.1
+        environment:
+#          PHP_XDEBUG: 1
+#          PHP_XDEBUG_DEFAULT_ENABLE: 1
+#          PHP_XDEBUG_REMOTE_CONNECT_BACK: 0
+#          PHP_IDE_CONFIG: serverName=PHPSTORM
+#          PHP_XDEBUG_REMOTE_HOST: 172.17.0.1 # Linux
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - composer-v1-{{ checksum "composer.json" }}
+      - run: composer install
+      - save_cache:
+          key: composer-v1-{{ checksum "composer.json" }}
+          paths:
+            - vendor
+      - run:
+          name: Run codeception API tests
+          command: bin/phpunit --verbose --debug
+  deploy:
+    docker:
+      - image: buildpack-deps:trusty
+    steps:
+      - checkout
+      - run:
+          name: Deploy Master to Heroku
+          command: |
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - tests
+      - deploy:
+          requires:
+            - tests
+          filters:
+            branches:
+              only: master
