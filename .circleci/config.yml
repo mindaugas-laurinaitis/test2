@@ -21,8 +21,8 @@ jobs:
           paths:
             - vendor
       - run:
-          name: Run codeception API tests
-          command: bin/phpunit --verbose --debug
+          name: Run tests
+          command: vendor/bin/phpunit --verbose --debug
   deploy:
     docker:
       - image: buildpack-deps:trusty
