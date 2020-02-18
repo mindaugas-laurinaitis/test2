@@ -3,19 +3,16 @@
 namespace App\Repository;
 
 use App\Entity\IdentifiableInterface;
-use PhpParser\Node\Param;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 abstract class AbstractRepository
 {
-    protected const BASE_STORE_PATH = __DIR__ . '/../../var/db';
 
     /**
      * @var Filesystem
@@ -38,7 +35,7 @@ abstract class AbstractRepository
     {
         $this->fileSystem = new Filesystem();
 
-        $this->fileSystem->mkdir(self::BASE_STORE_PATH);
+        $this->fileSystem->mkdir(self::getBaseStorePath());
 
         $this->finder = new Finder();
 
@@ -119,6 +116,11 @@ abstract class AbstractRepository
 
     protected function getEntityPath(): string
     {
-        return self::BASE_STORE_PATH . '/' . $this->slugger->slug($this->getTargetEntity());
+        return self::getBaseStorePath() . '/' . $this->slugger->slug($this->getTargetEntity());
+    }
+
+    protected static function getBaseStorePath(): string
+    {
+        return sys_get_temp_dir();
     }
 }
